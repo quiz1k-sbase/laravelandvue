@@ -2,6 +2,7 @@
 
 @section('content')
 
-    <div id="registration"></div>
+<div id="app">
+</div>
 
 @endsection

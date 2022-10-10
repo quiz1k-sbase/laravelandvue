@@ -1,10 +1,10 @@
 <template>
-    <h1>Welcome page from vue js</h1>
+        <router-view></router-view>
 </template>
 
 <script>
 export default {
-    name: "Welcome"
+    name: "App"
 }
 </script>
 

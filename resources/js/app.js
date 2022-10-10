@@ -1,6 +1,9 @@
 import { createApp} from "vue";
-import Welcome from "./Welcome.vue";
-import Registration from "./Registration.vue";
+import App from "./App.vue";
+import router from "./routes";
 
-createApp(Welcome).mount('#app');
-createApp(Registration).mount('#registration');
+const app = createApp(App);
+
+app.use(router);
+
+app.mount('#app');
