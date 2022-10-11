@@ -19,12 +19,12 @@
                 <div class="container g-3" v-if="comments?.length">
 
                     <div  v-for="comment in comments" :key="comment.id">
-                        <Comment
-                            v-if="post_data.id === comment.post_id && comment.parent_id == null"
-                            :key="comment.id"
-                            :comment_data="comment"
-                            :post_data="post_data"
-                        />
+                    <Comment
+                        v-if="post_data.id === comment.post_id && comment.parent_id == null"
+                        :key="comment.id"
+                        :comment_data="comment"
+                        :post_data="post_data"
+                    />
                     </div>
                 </div>
             </div>

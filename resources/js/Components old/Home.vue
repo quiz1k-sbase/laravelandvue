@@ -31,7 +31,8 @@
                 :key="post.id"
                 v-bind:post_data="post"
                 v-bind:comments="comments"
-                />
+                v-bind:counter-of-comments="counterOfComments">
+                </Post>
             </div>
         </div>
     </div>
@@ -79,79 +80,104 @@
 
 </template>
 
-<script setup>
+<script>
 import {useRouter} from 'vue-router';
 import {reactive, ref, onMounted} from "vue";
 import {computed} from "vue";
 import axios from "axios";
 import Post from "./Post.vue";
-const router = useRouter();
+import Comment from "./Comment.vue";
+export default {
+    name: "Home",
+    components: {Comment, Post},
+    setup() {
+        const router = useRouter();
 
 
-// Variables for Posts
+        // Variables for Posts
 
-const posts = ref([]);
+        const posts = ref([]);
 
-let form = reactive({
-    text_en: ''
-});
+        let form = reactive({
+            text_en: ''
+        });
 
-// Variables for comments
+        // Variables for comments
 
-const comments = ref([]);
+        const comments = ref([]);
 
-let formCommentReply = reactive({
-    comment: '',
-    post_id: '',
-    parent_id: ''
-});
+        let formCommentReply = reactive({
+            comment: '',
+            post_id: '',
+            parent_id: ''
+        });
 
-let errors = ref('');
+        let errors = ref('');
 
-onMounted(() => {
-    axios.get('posts').then(response => {
-        posts.value = response.data;
-    }).catch((error) => {
-        console.log(error);
-    });
-    axios.get('comments').then(res => {
-        comments.value = res.data;
-    }).catch((error) => {
-        console.log(error);
-    });
-})
+        onMounted(() => {
+            axios.get('posts').then(response => {
+                posts.value = response.data;
+            }).catch((error) => {
+                console.log(error);
+            });
+            axios.get('comments').then(res => {
+                comments.value = res.data;
+            }).catch((error) => {
+                console.log(error);
+            });
+        })
 
-// POSTS
+        // POSTS
 
-const addPost = async () => {
-    await axios.post('store', form).then(res => {
-        posts.value = res.data.data;
-        form.text_en = '';
-    }).catch(e => {
-        console.log(e);
-        errors.value = e;
-    });
-};
+        const addPost = async () => {
+            await axios.post('store', form).then(res => {
+                posts.value = res.data.data;
+                form.text_en = '';
+            }).catch(e => {
+                console.log(e);
+                errors.value = e;
+            });
+        };
 
-// COMMENTS
+        // COMMENTS
 
-const addCommentReply = async () => {
-    formCommentReply.parent_id = globalId;
-    formCommentReply.post_id = $("#post_id").val();
-    console.log(formCommentReply)
-    await axios.post('storeCommentReply', formCommentReply).then(res => {
-        comments.value = res.data.data;
-        formCommentReply.comment = '';
-        document.getElementById('closeAddCommentReply').click();
-    }).catch(e => {
-        console.log(e);
-        errors.value = e;
-    });
-};
+        const addCommentReply = async () => {
+            formCommentReply.parent_id = globalId;
+            formCommentReply.post_id = $("#post_id").val();
+            console.log(formCommentReply)
+            await axios.post('storeCommentReply', formCommentReply).then(res => {
+                comments.value = res.data.data;
+                formCommentReply.comment = '';
+                document.getElementById('closeAddCommentReply').click();
+            }).catch(e => {
+                console.log(e);
+                errors.value = e;
+            });
+        };
 
-function logout() {
-    localStorage.removeItem('token');
-    router.push({name: 'login'});
+        function logout() {
+            localStorage.removeItem('token');
+            router.push({name: 'login'});
+        }
+
+        let counterOfComments = computed(() => comments.value.length);
+
+        return {
+            form,
+            posts,
+            comments,
+            counterOfComments,
+            formCommentReply,
+            addPost,
+            logout,
+            addCommentReply,
+        }
+    },
+    methods: {
+        getComment(data) {
+            this.comments.value = data;
+        }
+    }
 }
 </script>
 
