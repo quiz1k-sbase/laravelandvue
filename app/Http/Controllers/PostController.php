@@ -12,10 +12,7 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = Post::join('users', 'user_id', '=', 'users.id')->get(['posts.*', 'users.username']);
-        foreach ($posts as $post){
-            $post->comment;
-        }
+        $posts = Post::with("comment")->join('users', 'user_id', '=', 'users.id')->get(['posts.*', 'users.username']);
         return array_reverse($posts->toArray());
     }
 
