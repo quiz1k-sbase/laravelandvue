@@ -26,11 +26,13 @@
         <div class="d-flex card-header justify-content-center">Posts:</div>
         <div class="card-body">
             <div class="row row-cols-1 g-3" id="all_comments">
+
                 <Post
                 v-for="post in posts"
                 :key="post.id"
                 v-bind:post_data="post"
                 @sendPostId="readPostId"
+                @deletePost="deletePost"
                 />
             </div>
         </div>
@@ -77,62 +79,15 @@
     </div>
 
 
-    <!-- Comment edit -->
-<!--    <div class="modal fade" id="editComment" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit comment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Input new text</label><br>
-                    <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="comment_data.comment"></textarea><br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditComment">Close</button>
-                    <button type="submit" class="btn btn-primary" @click="updateComment()">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>-->
-
-    <!-- Add comment reply -->
-    <div class="modal fade" id="addCommentReply" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add comment reply</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Input new text</label><br>
-                    <textarea class="form-control" type="text" name="addComment" rows="3" v-model="formCommentReply.comment"></textarea><br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeAddCommentReply">Close</button>
-                    <button type="submit" class="btn btn-primary" v-on:click="addCommentReply">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
 </template>
 
 <script setup>
 import {useRouter} from 'vue-router';
-import {reactive, ref, onMounted, defineProps} from "vue";
+import {ref, onMounted} from "vue";
 import axios from "axios";
 import Post from "./Post.vue";
 const router = useRouter();
 
-const props = defineProps({
-    getText: {
-        type: Function,
-        required: true,
-    },
-})
 
 // Variables for Posts
 
@@ -140,13 +95,14 @@ let post_id = null;
 
 const posts = ref([]);
 
-let form = reactive({
+let form = ref({
     text_en: ''
 });
 
 const addCommentForm = ref([]);
 
 const updateText = ref([]);
+
 // Variables for comments
 
 const comments = ref([]);
@@ -170,9 +126,9 @@ onMounted(() => {
 // POSTS
 
 const addPost = async () => {
-    await axios.post('store', form).then(res => {
+    await axios.post('store', form.value).then(res => {
         posts.value = res.data.data;
-        form.text_en = '';
+        form.value = '';
     }).catch(e => {
         console.log(e);
         errors.value = e;
@@ -181,6 +137,7 @@ const addPost = async () => {
 
 const addComment = async () => {
     await axios.post('storeComment', {'post_id' : post_id, 'comment' : addCommentForm.value}).then(res => {
+        posts.value = res.data.data;
         addCommentForm.value = '';
         document.getElementById('closeAddComment').click();
     }).catch(e => {
@@ -191,10 +148,9 @@ const addComment = async () => {
 
 const updatePost = () =>
 {
-    console.log('post id ' + post_id)
-    console.log(updateText.value)
     axios.post(`update/${post_id}`, {text_en: updateText.value}).then(res => {
-        //document.getElementById('changeText-' + globalId).innerHTML = updateText.text_en;
+        const tmp = posts.value.find(el => el.id === post_id);
+        tmp.text_en = res.data.data;
         updateText.value = '';
         document.getElementById('closeEditPost').click()
     }).catch(e => {
@@ -203,27 +159,22 @@ const updatePost = () =>
     });
 }
 
-// COMMENTS
+const deletePost = (id) => {
+    if (confirm('Do you want delete this post?')) {
+        axios.delete(`delete/${id}`)
+            .then(response => {
+                posts.value.splice(posts.value.find(el => el.id === id), 1);
+            }).catch((error) => {
+            console.log(error);
+        });
+    }
+}
 
-const addCommentReply = async () => {
-    formCommentReply.parent_id = globalId;
-    formCommentReply.post_id = $("#post_id").val();
-    console.log(formCommentReply)
-    await axios.post('storeCommentReply', formCommentReply).then(res => {
-        comments.value = res.data.data;
-        formCommentReply.comment = '';
-        document.getElementById('closeAddCommentReply').click();
-    }).catch(e => {
-        console.log(e);
-        errors.value = e;
-    });
-};
-
-function readPostId(data) {
+const readPostId = (data) => {
     return post_id = data;
 }
 
-function logout() {
+const logout = () => {
     localStorage.removeItem('token');
     router.push({name: 'login'});
 }

@@ -31,7 +31,7 @@ class CommentController extends Controller
         ]);
 
         if ($comm) {
-            return response()->json(['message' => 'Comment created successfully', 'data' => $this->index()]);
+            return response()->json(['message' => 'Comment created successfully', 'data' => $this->getComments()]);
         } else {
             return response()->json(['message' => 'Post was not created']);
         }
@@ -74,5 +74,10 @@ class CommentController extends Controller
         } else {
             return response()->json(['message' => 'Post was not created']);
         }
+    }
+
+    public function getComments() {
+        $comm = Post::with("comment")->join('users', 'user_id', '=', 'users.id')->get(['posts.*', 'users.username']);
+        return array_reverse($comm->toArray());
     }
 }

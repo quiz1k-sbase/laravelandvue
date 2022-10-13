@@ -62,7 +62,7 @@ class PostController extends Controller
         $post = Post::find($id);
         $post->update($request->all());
 
-        return response()->json('The post successfully updated');
+        return response()->json(['message' => 'The post successfully updated', 'data' => $request['text_en']]);
     }
 
     public function delete($id)
