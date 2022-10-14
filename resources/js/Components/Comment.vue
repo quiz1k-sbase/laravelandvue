@@ -34,10 +34,9 @@
             </div>
             <div
                 class="container g-3"
-                id="replyComments"
-                v-if="comment_data.replies.length"
+                :id="'replyComments-' + comment_data.id"
             >
-                <teleport v-if="isLoaded" to="#replyComments">
+                <teleport v-if="isLoaded" :to="'#replyComments-' + comment_data.id">
                     <CommentReply
                         v-for="comment in comment_data.replies"
                         :key="comment_data.id"
@@ -62,7 +61,7 @@
                     <textarea class="form-control" type="text" name="addComment" rows="3" v-model="commentReply"></textarea><br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeAddCommentReply">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeAddCommentReply-' + comment_data.id">Close</button>
                     <button type="submit" class="btn btn-primary" v-on:click="addCommentReply(comment_data.id)">Add</button>
                 </div>
             </div>
@@ -82,28 +81,8 @@
                     <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="updateCommentText"></textarea><br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditComment">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeEditComment-' + comment_data.id">Close</button>
                     <button type="submit" class="btn btn-primary" @click="updateComment(comment_data.id)">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Comment edit -->
-    <div class="modal fade" :id="'editCommentReply-' + comment_data.id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit comment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Input new text</label><br>
-                    <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="updateCommentReplyText"></textarea><br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditCommentReply">Close</button>
-                    <button type="submit" class="btn btn-primary" @click="updateCommentReply(comment_data.id)">Add</button>
                 </div>
             </div>
         </div>
@@ -144,8 +123,7 @@ const updateCommentText = ref(props.comment_data.comment);
 const updateComment = (id) => {
     axios.post(`updateComment/${id}`, {comment: updateCommentText.value}).then(res => {
         props.comment_data.comment = updateCommentText.value;
-        updateCommentText.value = '';
-        document.getElementById('closeEditComment').click()
+        document.getElementById('closeEditComment-' + id).click()
     }).catch(e => {
         console.log(e);
     });
@@ -154,9 +132,12 @@ const addCommentReply = async (id) => {
     console.log(id)
     let findElem = props.comment_data
     await axios.post('storeCommentReply', {'post_id': findElem.post_id, 'parent_id': id, 'comment': commentReply.value}).then(res => {
-        props.comment_data.replies = res.data.data[0].replies;
+
+        let elem = res.data.data.find(el => el.id === id).replies;
+        props.comment_data.replies = elem;
+        console.log(props.comment_data)
         commentReply.value = '';
-        document.getElementById('closeAddCommentReply').click();
+        document.getElementById('closeAddCommentReply-' + id).click();
     }).catch(e => {
         console.log(e);
     });

@@ -60,7 +60,7 @@
                     <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="updateText"></textarea><br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditPost">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeEditPost-' + post_data.id">Close</button>
                     <button type="submit" class="btn btn-primary" v-on:click="updatePost(post_data.id)">Add</button>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                     <textarea class="form-control" type="text" name="addComment" rows="3" v-model="addCommentForm" ></textarea><br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeAddComment">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeAddComment-' + post_data.id">Close</button>
                     <button type="submit" class="btn btn-primary" @click="addComment(post_data.id)">Add</button>
                 </div>
             </div>
@@ -100,8 +100,6 @@ const emits = defineEmits(["sendPostId", "deletePost"])
 
 const addCommentForm = ref([]);
 
-const updateText = ref([]);
-
 const props = defineProps({
     post_data: {
         type: Object,
@@ -110,6 +108,10 @@ const props = defineProps({
         }
     }
 })
+
+const post = ref(props.post_data);
+
+const updateText = ref(post.value.text_en);
 
 onMounted(() => {
 })
@@ -134,11 +136,9 @@ const deleteComment = (id) => {
 
 const addComment = async (id) => {
     await axios.post('storeComment', {'post_id' : id, 'comment' : addCommentForm.value}).then(res => {
-        let findElem = props.post_data.id.find(el => el.id === id);
-        console.log(findElem)
-        props.post_data.comment = res.data.data[0].comment;
+        post.value.comment = res.data.data.find(el => el.id === id).comment;
         addCommentForm.value = '';
-        document.getElementById('closeAddComment').click();
+        document.getElementById('closeAddComment-' + id).click();
     }).catch(e => {
         console.log(e);
     });
@@ -147,13 +147,10 @@ const addComment = async (id) => {
 const updatePost = (id) =>
 {
     axios.post(`update/${id}`, {text_en: updateText.value}).then(res => {
-        const tmp = posts.value.find(el => el.id === post_id);
-        tmp.text_en = res.data.data;
-        updateText.value = '';
-        document.getElementById('closeEditPost').click()
+        post.value.text_en = res.data.data;
+        document.getElementById('closeEditPost-' + id).click()
     }).catch(e => {
         console.log(e);
-        errors.value = e;
     });
 }
 

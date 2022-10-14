@@ -12,8 +12,7 @@
                         type="button"
                         class="btn btn-warning"
                         data-bs-toggle="modal"
-                        data-bs-target="#addCommentReply"
-                        @click="$emit('getCommentReplyId', comment_data.id)"
+                        :data-bs-target="'#addCommentReply-' + comment_data.id"
                     >
                         Reply
                     </button>
@@ -21,8 +20,7 @@
                         type="button"
                         class="btn btn-warning ms-2 me-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#editCommentReply"
-                        @click="$emit('getCommentReplyId', comment_data.id)"
+                        :data-bs-target="'#editCommentReply-' + comment_data.id"
                     >
                         Edit
                     </button>
@@ -36,22 +34,61 @@
             </div>
             <div
                 class="container g-3"
-                id="commentsReplyContainer"
-                v-if="comment_data.replies.length"
+                :id="'commentsReplyContainer-' + comment_data.id"
             >
-                <teleport v-if="isLoaded" to="#commentsReplyContainer">
+                <teleport v-if="isLoaded" :to="'#commentsReplyContainer-' + comment_data.id">
                     <CommentReply
                         v-for="comment in comment_data.replies"
                         :key="comment_data.id"
                         v-bind:comment_data="comment"
-                        @getCommentReplyId="getCommentReplyId"
                         @deleteComment="deleteComment"
-                        @readCommentId="readCommentId"
                     />
                 </teleport>
             </div>
         </div>
     </div>
+
+
+    <!-- Add comment reply -->
+    <div class="modal fade" :id="'addCommentReply-' + comment_data.id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add comment reply</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Input new text</label><br>
+                    <textarea class="form-control" type="text" name="addComment" rows="3" v-model="commentReply"></textarea><br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeAddCommentReply-' + comment_data.id">Close</button>
+                    <button type="submit" class="btn btn-primary" v-on:click="addCommentReply(comment_data.id)">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comment edit -->
+    <div class="modal fade" :id="'editCommentReply-' + comment_data.id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit comment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Input new text</label><br>
+                    <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="updateCommentReplyText"></textarea><br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :id="'closeEditCommentReply-' + comment_data.id">Close</button>
+                    <button type="submit" class="btn btn-primary" @click="updateCommentReply(comment_data.id)">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <script setup>
@@ -75,7 +112,7 @@ const emits = defineEmits(["readCommentId", "deleteComment", "getCommentReplyId"
 
 const commentReply = ref([]);
 
-const updateCommentReplyText = ref([]);
+const updateCommentReplyText = ref(props.comment_data.comment);
 
 //console.log(props.comment_data)
 
@@ -99,17 +136,26 @@ const deleteComment = (id) => {
     }
 }
 
-const readCommentId = (data) => {
-    emits('readCommentId', data);
-}
+const addCommentReply = async (id) => {
+    console.log(id)
+    let findElem = props.comment_data
+    await axios.post('storeCommentReply', {'post_id': findElem.post_id, 'parent_id': id, 'comment': commentReply.value}).then(res => {
 
-const updateCommentReply = () => {
-    console.log(replyId);
-    axios.post(`updateComment/${replyId}`, {comment: updateCommentReplyText.value}).then(res => {
-        let findElem = props.comment_data.replies.find(el => el.id === replyId);
-        findElem.comment = updateCommentReplyText.value;
+        let elem = res.data.data.find(el => el.id === id).replies;
+        props.comment_data.replies = elem;
+        console.log(props.comment_data)
+        commentReply.value = '';
+        document.getElementById('closeAddCommentReply-' + id).click();
+    }).catch(e => {
+        console.log(e);
+    });
+};
+
+const updateCommentReply = (id) => {
+    axios.post(`updateComment/${id}`, {comment: updateCommentReplyText.value}).then(res => {
+        props.comment_data.comment = updateCommentReplyText.value;
         updateCommentReplyText.value = '';
-        document.getElementById('closeEditCommentReply').click()
+        document.getElementById('closeEditCommentReply-' + id).click()
     }).catch(e => {
         console.log(e);
     });
