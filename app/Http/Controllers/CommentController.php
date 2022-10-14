@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -70,7 +71,7 @@ class CommentController extends Controller
         ]);
 
         if ($comm) {
-            return response()->json(['message' => 'Comment created successfully', 'data' => $this->index()]);
+            return response()->json(['message' => 'Comment created successfully', 'data' => Comment::find($data['parent_id'])->get()]);
         } else {
             return response()->json(['message' => 'Post was not created']);
         }
@@ -79,5 +80,9 @@ class CommentController extends Controller
     public function getComments() {
         $comm = Post::with("comment")->join('users', 'user_id', '=', 'users.id')->get(['posts.*', 'users.username']);
         return array_reverse($comm->toArray());
+    }
+
+    public function getUsername($id) {
+        return User::find($id)->username;
     }
 }

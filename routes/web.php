@@ -33,6 +33,7 @@ Route::controller(CommentController::class)->group(function () {
     Route::post('storeCommentReply', 'storeReply');
     Route::post('updateComment/{id}', 'update');
     Route::delete('deleteComment/{id}', 'delete');
+    Route::post('getUsername/{id}', 'getUsername');
 });
 
 

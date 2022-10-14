@@ -36,7 +36,8 @@ export default {
 
         let form = reactive({
             email: '',
-            password: ''
+            password: '',
+            _token: window.appConfig.csrf
         });
 
         let error = ref('');

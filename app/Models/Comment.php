@@ -16,6 +16,11 @@ class Comment extends Model
         'parent_id',
     ];
 
+    protected $with = [
+        'replies',
+        'user',
+    ];
+
     public function replies()
     {
         return $this->hasMany(Comment::class, 'parent_id');

@@ -66,7 +66,8 @@ export default {
             lastName: '',
             phone: '',
             password: '',
-            confirm_password: ''
+            confirm_password: '',
+            _token: window.appConfig.csrf
         })
 
         let errors = ref([]);

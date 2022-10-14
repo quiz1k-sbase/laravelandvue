@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::with("comment")->join('users', 'user_id', '=', 'users.id')->get(['posts.*', 'users.username']);
+
         return array_reverse($posts->toArray());
     }
 
@@ -22,7 +24,6 @@ class PostController extends Controller
             'text_en' => 'required|min:1',
         ]);
         $data = $request->all();
-
         $post = Post::create([
             'user_id' => Auth::user()->id,
             'text_en' => strip_tags($data['text_en']),

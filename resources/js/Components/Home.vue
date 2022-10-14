@@ -16,7 +16,7 @@
         <div class="row py-lg-5">
             <div class="d-flex col-lg-6 col-md-8 mx-auto flex-column flex-wrap align-content-center justify-content-center">
                     <label class="form-label">Input text</label><br>
-                    <textarea class="form-control w-100" type="text" name="text" rows="3" id="text" v-model="form.text_en" ref="postText"></textarea>
+                    <textarea class="form-control w-100" type="text" name="text" rows="3" id="text" v-model="form" ref="postText"></textarea>
                     <button class="btn btn-outline-primary w-100 mt-2" type="submit" id="submitButton" v-on:click="addPost">Add</button>
             </div>
         </div>
@@ -31,53 +31,11 @@
                 v-for="post in posts"
                 :key="post.id"
                 v-bind:post_data="post"
-                @sendPostId="readPostId"
                 @deletePost="deletePost"
                 />
             </div>
         </div>
     </div>
-
-    <!-- Post edit -->
-    <div class="modal fade" id="editPost" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit post</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Input new text</label><br>
-                    <textarea class="form-control" type="text" name="editedPost" rows="3" v-model="updateText"></textarea><br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeEditPost">Close</button>
-                    <button type="submit" class="btn btn-primary" v-on:click="updatePost">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add comment -->
-    <div class="modal fade" id="addComment" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add comment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <label class="form-label">Input new text</label><br>
-                    <textarea class="form-control" type="text" name="addComment" rows="3" v-model="addCommentForm" ></textarea><br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeAddComment">Close</button>
-                    <button type="submit" class="btn btn-primary" @click="addComment">Add</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 </template>
 
@@ -91,27 +49,13 @@ const router = useRouter();
 
 // Variables for Posts
 
-let post_id = null;
-
 const posts = ref([]);
 
-let form = ref({
-    text_en: ''
-});
-
-const addCommentForm = ref([]);
-
-const updateText = ref([]);
+let form = ref([]);
 
 // Variables for comments
 
 const comments = ref([]);
-
-let formCommentReply = ref({
-    comment: '',
-    post_id: '',
-    parent_id: ''
-});
 
 let errors = ref('');
 
@@ -126,7 +70,7 @@ onMounted(() => {
 // POSTS
 
 const addPost = async () => {
-    await axios.post('store', form.value).then(res => {
+    await axios.post('store', {text_en: form.value}).then(res => {
         posts.value = res.data.data;
         form.value = '';
     }).catch(e => {
@@ -135,29 +79,6 @@ const addPost = async () => {
     });
 };
 
-const addComment = async () => {
-    await axios.post('storeComment', {'post_id' : post_id, 'comment' : addCommentForm.value}).then(res => {
-        posts.value = res.data.data;
-        addCommentForm.value = '';
-        document.getElementById('closeAddComment').click();
-    }).catch(e => {
-        console.log(e);
-        errors.value = e;
-    });
-}
-
-const updatePost = () =>
-{
-    axios.post(`update/${post_id}`, {text_en: updateText.value}).then(res => {
-        const tmp = posts.value.find(el => el.id === post_id);
-        tmp.text_en = res.data.data;
-        updateText.value = '';
-        document.getElementById('closeEditPost').click()
-    }).catch(e => {
-        console.log(e);
-        errors.value = e;
-    });
-}
 
 const deletePost = (id) => {
     if (confirm('Do you want delete this post?')) {
@@ -168,10 +89,6 @@ const deletePost = (id) => {
             console.log(error);
         });
     }
-}
-
-const readPostId = (data) => {
-    return post_id = data;
 }
 
 const logout = () => {
