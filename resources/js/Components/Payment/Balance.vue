@@ -20,7 +20,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="mb-2">Price</label>
-                                        <input type="number" name="balance" id="card-price" class="form-control" value="5" step="0.01">
+                                        <input type="number" name="amount" id="card-price" class="form-control" value="5" step="0.01">
                                     </div>
                                 </div>
                             </div>
@@ -34,7 +34,7 @@
                                 </div>
                                 <div class="col-xl-12 col-lg-12">
                                     <hr>
-                                    <button type="submit" class="btn btn-primary" id="card-button" :data-secret="intent.client_secret">Purchase</button>
+                                    <button type="submit" name="_token" class="btn btn-primary" id="card-button" :data-secret="intent.client_secret">Purchase</button>
                                 </div>
                             </div>
 
@@ -50,6 +50,9 @@
 <script setup>
 import {defineProps, onMounted, ref} from "vue";
 import axios from "axios";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps({
     plan: {
@@ -88,8 +91,7 @@ onMounted(() => {
                 payment_method: {
                     card: cardElement,
                     billing_details: {
-                        name: cardHolderName.value,
-                        amount: cardPrice.value
+                        name: cardHolderName.value
                     }
                 }
             }
@@ -100,13 +102,19 @@ onMounted(() => {
         } else {
             let token = document.createElement('input')
             token.setAttribute('type', 'hidden')
-            token.setAttribute('name', 'token')
+            token.setAttribute('name', 'payment_method')
             token.setAttribute('value', setupIntent.payment_method)
             form.appendChild(token)
+            console.log(e)
+            console.log(form)
             const data = Object.fromEntries(new FormData(e.target).entries());
             console.log(data)
             axios.post('donate', data).then(res => {
-                console.log(res)
+                if (res.data.success === 200) {
+                    router.push({name: 'home'});
+                } else {
+                    alert('Something went wrong');
+                }
             })
         }
     })
