@@ -10,5 +10,4 @@
         csrf: "{{csrf_token()}}",
     }
 </script>
-
 @endsection

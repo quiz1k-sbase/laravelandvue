@@ -27,6 +27,38 @@ const router = createRouter({
                 requiresAuth: false
             }
         },
+        {
+            path: '/user',
+            name: 'user',
+            component: () => import('./Components/UserProfile.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/plans',
+            name: 'plans',
+            component: () => import('./Components/Payment/Plans.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/subscription',
+            name: 'subscription',
+            component: () => import('./Components/Payment/Subscription.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/balance',
+            name: 'balance',
+            component: () => import('./Components/Payment/Balance.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
     ]
 })
 

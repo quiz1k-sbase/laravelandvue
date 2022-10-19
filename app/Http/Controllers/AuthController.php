@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,11 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
+    public function index() {
+        $user = User::find(Auth::user()->id);
+        return response()->json(['user' => $user]);
+    }
 
     public function register(Request $request)
     {
@@ -81,12 +87,115 @@ class AuthController extends Controller
 
     }
 
-
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
             $this->user = Auth::user();
             return $next($request);
         });
+    }
+
+    public function changeName(Request $request) {
+        $request->validate([
+            'oldFirstName' => 'required',
+            'newFirstName' => 'required',
+            'oldLastName' => 'required',
+            'newLastName' => 'required',
+        ]);
+        $data = $request->all();
+        if (Auth::user()->first_name === $data['oldFirstName'] && Auth::user()->last_name === $data['oldLastName']) {
+
+            User::where('id', '=', Auth::user()->id)->update([
+                'first_name' => $data['newFirstName'],
+                'last_name' => $data['newLastName'],
+            ]);
+            return response()->json(['status' => 200]);
+        }
+        else {
+            return response()->json(['status' => 500]);
+        }
+    }
+
+    public function changeEmail(Request $request) {
+        $request->validate([
+            'oldEmail' => 'required',
+            'newEmail' => 'required',
+        ]);
+
+        $data = $request->all();
+
+        if ($data['oldEmail'] === Auth::user()->email) {
+
+            User::where('id', '=', Auth::user()->id)->update([
+                'email' => $data['newEmail'],
+            ]);
+            return response()->json(['status' => 200]);
+        }
+        else {
+            return response()->json(['status' => 500]);
+        }
+    }
+
+    public function changePhone(Request $request) {
+        $request->validate([
+            'oldPhone' => 'required',
+            'newPhone' => 'required',
+        ]);
+
+        $data = $request->all();
+
+        if ($data['oldPhone'] === Auth::user()->phone) {
+
+            User::where('id', '=', Auth::user()->id)->update([
+                'phone' => $data['newPhone'],
+            ]);
+            return response()->json(['status' => 200]);
+        }
+        else {
+            return response()->json(['status' => 500]);
+        }
+    }
+
+    public function changePassword(Request $request) {
+        $request->validate([
+            'email' => 'required',
+            'newPassword' => 'required',
+        ]);
+
+        $data = $request->all();
+
+        if ($data['email'] === Auth::user()->email) {
+
+            User::where('id', '=', Auth::user()->id)->update([
+                'password' => Hash::make($data['newPassword']),
+            ]);
+            return response()->json(['status' => 200]);
+        }
+        else {
+            return response()->json(['status' => 500]);
+        }
+    }
+
+    private function storeImage(Request $request)
+    {
+        if ($request->image != 'undefined') {
+            $newImageName = uniqid() . '-userphoto' . '.' . $request->image->extension();
+            return $request->image->move('images/', $newImageName);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function addPhoto(Request $request)
+    {
+        $request->validate([
+            'image' => 'nullable|max:2048|'
+        ]);
+        $data = $request->all();
+        User::where('id', '=', Auth::user()->id)->update([
+            'image' => $this->storeImage($request) ?? null,
+        ]);
+        return response()->json(['success' => 'Photo uploaded successfully']);
     }
 }

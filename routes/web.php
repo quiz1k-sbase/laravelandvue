@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +38,27 @@ Route::controller(CommentController::class)->group(function () {
     Route::post('getUsername/{id}', 'getUsername');
 });
 
+Route::get('userdata', [AuthController::class, 'index']);
+Route::controller(AuthController::class)->group(function () {
+    Route::post('changeName', 'changeName');
+    Route::post('changeEmail', 'changeEmail');
+    Route::post('changePhone', 'changePhone');
+    Route::post('changePassword', 'changePassword');
+    Route::post('addPhoto', 'addPhoto');
+});
+
+/*Route::middleware("auth")->group(function () {
+    Route::get('plansData', [StripeController::class, 'index']);
+    Route::get('plansData/{plan}', [StripeController::class, 'show'])->name("plans.show");
+    Route::post('subscriptionCreate', [StripeController::class, 'subscription'])->name("subscription.create");
+    Route::get('getToken', [StripeController::class, 'getToken'])->name("getToken");
+    Route::post('donate', [StripeController::class, 'donate'])->name("donate");
+});*/
+
+Route::middleware("auth")->group(function () {
+    Route::get('getToken', [BalanceController::class, 'index']);
+    Route::post('donate', [BalanceController::class, 'store'])->name("donate");
+});
 
 Route::get('/{any}', function () {
     return view('app');

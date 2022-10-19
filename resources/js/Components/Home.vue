@@ -4,6 +4,12 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav m-2">
                     <li class="nav-item me-2">
+                        <router-link to="balance" type="button" class="btn btn-success">Donate</router-link>
+                    </li>
+                    <li class="nav-item me-2">
+                        <router-link to="user" type="button" class="btn btn-primary">Profile</router-link>
+                    </li>
+                    <li class="nav-item me-2">
                         <button type="button" class="btn btn-danger" v-on:click="logout">Logout</button>
                     </li>
                 </ul>
