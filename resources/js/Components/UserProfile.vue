@@ -98,6 +98,19 @@
                                                               id="changePasswordButton">Change password</a></p>
                             </div>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Download data</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <a
+                                    :href="url + user.id"
+                                >
+                                    <button class="btn btn-primary" @click="getExport(user.id)">Download</button>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -267,6 +280,7 @@ const changeEmailForm = ref([]);
 const changePhoneForm = ref([]);
 const changePasswordForm = ref([]);
 const photo = ref([]);
+let url = 'userDataExport/';
 
 onMounted(() => {
     axios.get('userdata').then(response => {
@@ -376,5 +390,12 @@ const onUpload = async () => {
 
 const getBalance = (balance) => {
     return balance / (-100);
+}
+
+const getExport = async (id) => {
+    url += id;
+    /*await axios.get(url + id).then(res => {
+        console.log(res);
+    })*/
 }
 </script>

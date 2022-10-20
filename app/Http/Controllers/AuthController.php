@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
 use App\Http\Controllers\Controller;
+use App\Models\Post;
 use App\Models\User;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AuthController extends Controller
 {
@@ -197,5 +200,13 @@ class AuthController extends Controller
             'image' => $this->storeImage($request) ?? null,
         ]);
         return response()->json(['success' => 'Photo uploaded successfully']);
+    }
+
+    public function userDataExport($user) {
+        $array = User::with('posts')->
+        whereKey($user)->
+        get(['users.id', 'users.username', 'users.email', 'users.first_name', 'users.last_name', 'users.phone',
+            'users.created_at', 'users.updated_at', 'users.balance']);
+        return (new UserExport($array))->download('user.xlsx');
     }
 }
