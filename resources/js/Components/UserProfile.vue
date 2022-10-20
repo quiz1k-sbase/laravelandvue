@@ -40,6 +40,18 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-3">
+                                <p class="mb-0">Your balance</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" id="balance">${{ getBalance(user.balance)}}</p>
+                                <p class="text-muted mb-0">
+                                    <router-link to="balance">Donate</router-link>
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
                                 <p class="mb-0">Full Name</p>
                             </div>
                             <div class="col-sm-9">
@@ -332,7 +344,6 @@ const changePhone = async () => {
 }
 
 const changePassword = async () => {
-    console.log(changePasswordForm.value)
     await axios.post('changePassword', {
         email: changePasswordForm.value.email,
         newPassword: changePasswordForm.value.newPassword,
@@ -361,5 +372,9 @@ const onUpload = async () => {
     await axios.post('addPhoto', fd).then(res => {
         console.log(res);
     })
+}
+
+const getBalance = (balance) => {
+    return balance / (-100);
 }
 </script>

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Balance;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Stripe\StripeClient;
 
 class BalanceController extends Controller
@@ -26,6 +28,12 @@ class BalanceController extends Controller
 
         $response = $user->charge($amount, $paymentMethod->id);
 
+        $balance = Balance::create([
+            'user_id' => Auth::user()->id,
+            'balance' => User::where('id', '=', Auth::user()->id)->value('balance'),
+            'status' => $response->status
+        ]);
+
         if ($response->status === 'succeeded')
         {
             $stripe = new StripeClient(
@@ -35,8 +43,13 @@ class BalanceController extends Controller
                 auth()->user()->stripe_id,
                 ['amount' => -$amount, 'currency' => 'usd']
             );
-            User::where('id', '=', $user->id)->update(['balance' => $balanceUser->ending_balance]);
+            $as = $stripe->invoices->create([
+                'customer' => auth()->user()->stripe_id,
+            ]);
 
+            Balance::where('id', '=', $balance->id)->update(['balance' => $balanceUser->ending_balance]);
+
+            User::where('id', '=', $user->id)->update(['balance' => $balanceUser->ending_balance]);
             return response()->json(['success' => 200]);
         } else {
             return response()->json(['success' => 500]);

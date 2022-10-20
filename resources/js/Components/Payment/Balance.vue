@@ -105,13 +105,10 @@ onMounted(() => {
             token.setAttribute('name', 'payment_method')
             token.setAttribute('value', setupIntent.payment_method)
             form.appendChild(token)
-            console.log(e)
-            console.log(form)
             const data = Object.fromEntries(new FormData(e.target).entries());
-            console.log(data)
             axios.post('donate', data).then(res => {
                 if (res.data.success === 200) {
-                    router.push({name: 'home'});
+                    router.push({name: 'user'});
                 } else {
                     alert('Something went wrong');
                 }

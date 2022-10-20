@@ -13,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('balances', function (Blueprint $table) {
+        Schema::create('balances_statuses', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id');
-            $table->bigInteger('money');
-            $table->string('currency');
-            $table->string('token');
+            $table->double('balance');
             $table->string('status');
             $table->timestamps();
         });
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('blance');
+        Schema::dropIfExists('balances_statuses');
     }
 };
