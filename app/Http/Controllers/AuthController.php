@@ -10,8 +10,10 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use mysql_xdevapi\Exception;
 
 class AuthController extends Controller
 {
@@ -42,7 +44,6 @@ class AuthController extends Controller
         }
 
         $data = $request->all();
-
         $user = User::create([
             'username' => $data['username'],
             'email' => $data['email'],
@@ -89,6 +90,16 @@ class AuthController extends Controller
         }
 
     }
+
+    function logout()
+    {
+        Session::flush();
+
+        Auth::logout();
+
+        return response()->json(['success' => 200]);
+    }
+
 
     public function __construct()
     {

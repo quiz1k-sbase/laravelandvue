@@ -24,44 +24,35 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import axios from "axios";
 import { reactive, ref } from "vue";
 import { useRouter } from 'vue-router';
-export default {
-    name: "Login",
-    components: {},
-    setup() {
-        const router = useRouter();
+const router = useRouter();
 
-        let form = reactive({
-            email: '',
-            password: '',
-            _token: window.appConfig.csrf
-        });
+let form = ref({
+    email: '',
+    password: '',
+    _token: window.appConfig.csrf
+});
 
-        let error = ref('');
+let error = ref('');
 
-        const login = async() => {
-            await axios.post('/login', form).then(res => {
-                if(res.data.success) {
-                    localStorage.setItem('token', res.data.data.token);
-                    router.push({name: 'home'});
-                } else {
-                    error.value = res.data.message;
-                }
-            })
+const login = async() => {
+    await axios.post('/login', {
+        email: form.value.email,
+        password: form.value.password,
+    }).then(res => {
+        if(res.data.success) {
+            localStorage.setItem('token', res.data.data.token);
+            router.push({name: 'home'});
+        } else {
+            error.value = res.data.message;
         }
-
-        return {
-            form,
-            login,
-            error
-        }
-    }
+    })
 }
-</script>
 
+</script>
 <style scoped>
 
 </style>

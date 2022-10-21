@@ -40,33 +40,4 @@ class StripeController extends Controller
 
         return response()->json(['success' => 200]);
     }
-
-    public function getToken(Request $request)
-    {
-        $intent = auth()->user()->createSetupIntent();
-        $user = User::find(Auth::user()->id);
-        $user->asStripeCustomer();
-        $user->applyBalance(-500);
-  /*      $transactions = $user->balanceTransactions();
-
-        foreach ($transactions as $transaction) {
-            // Transaction amount...
-            $amount = $transaction->amount(); // $2.31
-
-            // Retrieve the related invoice when available...
-            $invoice = $transaction->invoice();
-        }*/
-        dd($user->balance());
-
-        return response()->json(['intent' => $intent]);
-    }
-
-    public function donate(Request $request)
-    {
-        $plan = Plan::find($request->plan);
-        $subscription = $request->user()->newSubscription($request->plan, $plan->stripe_plan)
-            ->create($request->token);
-
-        return response()->json(['success' => 200]);
-    }
 }

@@ -48,7 +48,7 @@
     </div>
 </template>
 
-<script>
+<!--<script>
 import axios from "axios";
 import { reactive, ref } from "vue";
 import { useRouter } from 'vue-router';
@@ -90,8 +90,47 @@ export default {
         }
     }
 }
-</script>
+</script>-->
+<script setup>
+import axios from "axios";
+import { reactive, ref } from "vue";
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+
+let form = ref({
+    username: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    password: '',
+    confirm_password: '',
+    _token: window.appConfig.csrf
+})
+
+let errors = ref([]);
+
+const register = async() => {
+    console.log(form.value)
+    await axios.post('register', {
+        username: form.value.username,
+        email: form.value.email,
+        firstName: form.value.firstName,
+        lastName: form.value.lastName,
+        phone: form.value.phone,
+        password: form.value.password,
+        confirm_password: form.value.confirm_password,
+    }).then(res => {
+        if(res.data.success) {
+            localStorage.setItem('token', res.data.data.token);
+            router.push({name: 'home'});
+        }
+    }).catch(e => {
+        errors.value = e.response.data.message;
+    })
+}
+</script>
 <style scoped>
 
 </style>

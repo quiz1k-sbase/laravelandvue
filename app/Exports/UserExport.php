@@ -54,7 +54,7 @@ class UserExport implements FromCollection, WithHeadings, ShouldAutoSize, WithMa
             $str .= preg_replace($pattern, $replace, $post->text_en);
         }
 
-        dd(rtrim($str, ', '));
+        $str = rtrim($str, ', ');
 
         return [
             $user->id,
@@ -65,19 +65,7 @@ class UserExport implements FromCollection, WithHeadings, ShouldAutoSize, WithMa
             $user->phone,
             $user->created_at,
             $user->balance,
-            $rows,
+            $str,
         ];
     }
-
-    /*public function array(): array {
-        return $this->user->toArray();
-    }*/
-
-    /*public function query() {
-        return User::query()->with('posts');
-        /*return User::query()->select('users.*', 'posts.text_en', 'balances.balance', 'balances.status')->
-        where('id', '=', $this->user)->
-        join('posts', 'user_id', '=', $this->user)->
-        join('balances', 'user_id', '=', $this->user);
-    }*/
 }

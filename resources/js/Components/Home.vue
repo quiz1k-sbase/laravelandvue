@@ -100,6 +100,7 @@ const deletePost = (id) => {
 const logout = () => {
     localStorage.removeItem('token');
     router.push({name: 'login'});
+    axios.get('logout');
 }
 </script>
 
