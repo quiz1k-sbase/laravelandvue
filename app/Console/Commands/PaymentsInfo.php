@@ -1,27 +1,43 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Console\Commands;
 
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
-use Illuminate\Http\Request;
-use SbWereWolf\XmlNavigator\NavigatorFabric;
-use SimpleXMLElement;
+use Illuminate\Console\Command;
 
-class XMLParserController extends Controller
+class PaymentsInfo extends Command
 {
-    public function parse() {
-        /*$addedFiles = File::all()->toArray();
-        $bool = false;
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'payments:get';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'All payments were updated';
+
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
+    {
+        $addedFiles = File::all()->toArray();
         $files = glob(storage_path('app/public/documents/*.{xml}'), GLOB_BRACE);
 
         foreach ($files as $file) {
             if (in_array($file, array_column($addedFiles, 'filename'))) {
-                echo 'File is in array';
+                continue;
             }
             else {
-                echo $file . '<br>';
                 $xml = simplexml_load_file($file) or die('can\'t load xml');
                 $array = [];
                 $payments = [];
@@ -78,8 +94,9 @@ class XMLParserController extends Controller
                 File::create([
                     'filename' => $file,
                 ]);
-                echo 'done';
+                echo $file . " added\n";
             }
-        }*/
+        }
+        echo "Command finished completely\n";
     }
 }
