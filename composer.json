@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",
+        "sbwerewolf/xml-navigator": "^2.1",
         "stripe/stripe-php": "^9.7"
     },
     "require-dev": {

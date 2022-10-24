@@ -5,6 +5,7 @@ use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\XMLParserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,6 +63,8 @@ Route::middleware("auth")->group(function () {
     Route::get('getToken', [BalanceController::class, 'index']);
     Route::post('donate', [BalanceController::class, 'store'])->name("donate");
 });
+
+Route::get('parse', [XMLParserController::class, 'parse']);
 
 Route::get('/{any}', function () {
     return view('app');

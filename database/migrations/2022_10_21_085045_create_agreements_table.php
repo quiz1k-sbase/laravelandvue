@@ -13,11 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('balances', function (Blueprint $table) {
+        Schema::create('agreements', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('user_id');
-            $table->double('balance');
-            $table->string('status');
+            $table->string('leasing_subject');
+            $table->double('contract_cost');
+            $table->double('payment_amount');
+            $table->double('total_amount');
+            $table->date('validity_start');
+            $table->date('validity_end');
             $table->timestamps();
         });
     }
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('balances_statuses');
+        Schema::dropIfExists('agreements');
     }
 };
