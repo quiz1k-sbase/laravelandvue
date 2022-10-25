@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AgreementExport;
 use App\Exports\PaymentExport;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Events\AfterSheet;
 use SbWereWolf\XmlNavigator\NavigatorFabric;
 use SimpleXMLElement;
 use Maatwebsite\Excel\Facades\Excel;
 
 class XMLParserController extends Controller
 {
-    public function parse() {
+    /*public function parse() {
         $addedFiles = File::all()->toArray();
         $files = glob(storage_path('app/public/documents/*.{xml}'), GLOB_BRACE);
 
@@ -78,16 +81,20 @@ class XMLParserController extends Controller
                 File::create([
                     'filename' => $file,
                 ]);
-                $filename = basename($file, '.xml') . '.xlsx';
-                (new PaymentExport(array_merge($array, [
-                    'validity_start' => $dateArray[0][0],
-                    'validity_end' => $dateArray[0][1],
-                    'payments' => $payments
-                ])))->
-                download(
-                    $filename
-                );
             }
         }
+        $agreementExport = Agreement::all();
+        $paymentExport = Payment::all();
+        $this->storePayment($paymentExport);
+        $this->storeAgreement($agreementExport);
     }
+
+    public function storePayment($payment) {
+        return Excel::store(new PaymentExport($payment),'public/documents/payments.xlsx');
+    }
+
+    public function storeAgreement($agreement) {
+        return Excel::store(new AgreementExport($agreement),'public/documents/agreement.xlsx');
+    }*/
+
 }

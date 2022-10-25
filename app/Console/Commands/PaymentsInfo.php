@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Exports\AgreementExport;
+use App\Exports\PaymentExport;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
 use Illuminate\Console\Command;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PaymentsInfo extends Command
 {
@@ -97,6 +100,19 @@ class PaymentsInfo extends Command
                 echo $file . " added\n";
             }
         }
-        echo "Command finished completely\n";
+        $agreementExport = Agreement::all();
+        $paymentExport = Payment::all();
+        $this->storePayment($paymentExport);
+        $this->storeAgreement($agreementExport);
+        echo "Command completed successfully\n";
+    }
+
+
+    public function storePayment($payment) {
+        return Excel::store(new PaymentExport($payment),'public/documents/payments.xlsx');
+    }
+
+    public function storeAgreement($agreement) {
+        return Excel::store(new AgreementExport($agreement),'public/documents/agreement.xlsx');
     }
 }

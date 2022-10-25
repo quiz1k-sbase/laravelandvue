@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class PaymentExport implements FromCollection, ShouldAutoSize, ShouldQueue, WithMapping, WithHeadings, WithEvents
+class AgreementExport implements FromCollection, ShouldAutoSize, ShouldQueue, WithMapping, WithHeadings, WithEvents
 {
     use Queueable;
     use Exportable;
@@ -21,35 +21,35 @@ class PaymentExport implements FromCollection, ShouldAutoSize, ShouldQueue, With
     {
         return [
             'Id',
-            'Agreement id',
-            'Payment number',
-            'Settlement month',
-            'Redemption payment',
-            'Advance payment amount',
+            'Leasing subject',
+            'Contract cost',
+            'Payment amount',
             'Total amount',
+            'Validity start',
+            'Validity end',
         ];
     }
 
-    public function __construct($payment)
+    public function __construct($agreement)
     {
-        $this->payment = $payment;
+        $this->agreement = $agreement;
     }
 
     public function collection()
     {
-        return $this->payment;
+        return $this->agreement;
     }
 
-    public function map($payment): array
+    public function map($agreement): array
     {
         return [
-            $payment->id,
-            $payment->agreement_id,
-            $payment->payment_number,
-            $payment->settlement_month,
-            $payment->redemption_payment,
-            $payment->advance_payment_amount,
-            $payment->total_amount,
+            $agreement->id,
+            $agreement->leasing_subject,
+            $agreement->contract_cost,
+            $agreement->payment_amount,
+            $agreement->total_amount,
+            $agreement->validity_start,
+            $agreement->validity_end,
         ];
     }
 
