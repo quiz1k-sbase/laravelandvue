@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PaymentExport;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use SbWereWolf\XmlNavigator\NavigatorFabric;
 use SimpleXMLElement;
+use Maatwebsite\Excel\Facades\Excel;
 
 class XMLParserController extends Controller
 {
     public function parse() {
-        /*$addedFiles = File::all()->toArray();
-        $bool = false;
+        $addedFiles = File::all()->toArray();
         $files = glob(storage_path('app/public/documents/*.{xml}'), GLOB_BRACE);
 
         foreach ($files as $file) {
             if (in_array($file, array_column($addedFiles, 'filename'))) {
-                echo 'File is in array';
+                continue;
             }
             else {
-                echo $file . '<br>';
                 $xml = simplexml_load_file($file) or die('can\'t load xml');
                 $array = [];
                 $payments = [];
@@ -78,8 +78,16 @@ class XMLParserController extends Controller
                 File::create([
                     'filename' => $file,
                 ]);
-                echo 'done';
+                $filename = basename($file, '.xml') . '.xlsx';
+                (new PaymentExport(array_merge($array, [
+                    'validity_start' => $dateArray[0][0],
+                    'validity_end' => $dateArray[0][1],
+                    'payments' => $payments
+                ])))->
+                download(
+                    $filename
+                );
             }
-        }*/
+        }
     }
 }
