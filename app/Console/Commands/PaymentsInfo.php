@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Exports\AgreementExport;
 use App\Exports\PaymentExport;
+use App\Jobs\AgreementsInfoJob;
+use App\Jobs\PaymentsInfoJob;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
@@ -102,17 +104,8 @@ class PaymentsInfo extends Command
         }
         $agreementExport = Agreement::all();
         $paymentExport = Payment::all();
-        $this->storePayment($paymentExport);
-        $this->storeAgreement($agreementExport);
+        AgreementsInfoJob::dispatch($agreementExport);
+        PaymentsInfoJob::dispatch($paymentExport);
         echo "Command completed successfully\n";
-    }
-
-
-    public function storePayment($payment) {
-        return Excel::store(new PaymentExport($payment),'public/documents/payments.xlsx');
-    }
-
-    public function storeAgreement($agreement) {
-        return Excel::store(new AgreementExport($agreement),'public/documents/agreement.xlsx');
     }
 }

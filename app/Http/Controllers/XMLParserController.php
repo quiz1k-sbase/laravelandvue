@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Exports\AgreementExport;
 use App\Exports\PaymentExport;
+use App\Jobs\AgreementsInfoJob;
+use App\Jobs\PaymentsInfoJob;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
