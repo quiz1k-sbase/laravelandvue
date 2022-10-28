@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AExport;
 use App\Exports\AgreementExport;
+use App\Exports\FileExport;
 use App\Exports\PaymentExport;
+use App\Exports\UserExport;
 use App\Jobs\AgreementsInfoJob;
 use App\Jobs\PaymentsInfoJob;
+use App\Jobs\SendEmailJob;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Events\AfterSheet;
@@ -59,7 +64,7 @@ class XMLParserController extends Controller
                 $pattern = '/([0-9]?[0-9])[\.\-\/ ]+([0-1]?[0-9])[\.\-\/ ]+([0-9]{2,4})/';
                 preg_match_all($pattern, $array['Validity'], $dateArray);
                 if (!empty($array)) {
-                    Agreement::create([
+                    $agreement = Agreement::create([
                         'leasing_subject' => $array['LeasingSubject'],
                         'contract_cost' => $array['ContractCost'],
                         'payment_amount' => $array['PaymentAmount'],
@@ -86,17 +91,13 @@ class XMLParserController extends Controller
             }
         }
         $agreementExport = Agreement::all();
-        $paymentExport = Payment::all();
-        $this->storePayment($paymentExport);
-        $this->storeAgreement($agreementExport);
-    }
+        Excel::store(new AExport($agreementExport),'public/documents/agreements.xlsx');
 
-    public function storePayment($payment) {
-        return Excel::store(new PaymentExport($payment),'public/documents/payments.xlsx');
-    }
-
-    public function storeAgreement($agreement) {
-        return Excel::store(new AgreementExport($agreement),'public/documents/agreement.xlsx');
+        $file = glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE);
+        $details = [
+            'email' => 'user1@gmail.loc',
+            'file' => $file,
+        ];
+        SendEmailJob::dispatch($details);
     }*/
-
 }

@@ -17,4 +17,13 @@ class Agreement extends Model
         'validity_start',
         'validity_end',
     ];
+
+    protected $with = [
+        'payments',
+    ];
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'agreement_id');
+    }
 }

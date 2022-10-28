@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Exports\AExport;
 use App\Exports\AgreementExport;
 use App\Exports\PaymentExport;
 use App\Jobs\AgreementsInfoJob;
 use App\Jobs\PaymentsInfoJob;
+use App\Jobs\SendEmailJob;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
@@ -75,7 +77,7 @@ class PaymentsInfo extends Command
                 $pattern = '/([0-9]?[0-9])[\.\-\/ ]+([0-1]?[0-9])[\.\-\/ ]+([0-9]{2,4})/';
                 preg_match_all($pattern, $array['Validity'], $dateArray);
                 if (!empty($array)) {
-                    Agreement::create([
+                    $agreement = Agreement::create([
                         'leasing_subject' => $array['LeasingSubject'],
                         'contract_cost' => $array['ContractCost'],
                         'payment_amount' => $array['PaymentAmount'],
@@ -99,13 +101,18 @@ class PaymentsInfo extends Command
                 File::create([
                     'filename' => $file,
                 ]);
-                echo $file . " added\n";
+                echo "$file added\n";
             }
         }
         $agreementExport = Agreement::all();
-        $paymentExport = Payment::all();
-        AgreementsInfoJob::dispatch($agreementExport);
-        PaymentsInfoJob::dispatch($paymentExport);
+        Excel::store(new AExport($agreementExport),'public/documents/agreements.xlsx');
+
+        $file = glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE);
+        $details = [
+            'email' => 'user1@gmail.loc',
+            'file' => $file,
+        ];
+        SendEmailJob::dispatch($details);
         echo "Command completed successfully\n";
     }
 }
