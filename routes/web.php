@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\XMLParserController;
@@ -65,6 +66,9 @@ Route::middleware("auth")->group(function () {
 });
 
 Route::get('parse', [XMLParserController::class, 'parse']);
+
+Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
+Route::get('callback', [GoogleAuthController::class, 'callbackGoogle']);
 
 Route::get('/{any}', function () {
     return view('app');

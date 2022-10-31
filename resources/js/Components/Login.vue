@@ -18,6 +18,17 @@
                             <a class="link-primary" href="/forgot-password">Reset password</a>
                         </div>
                     </form>
+                    <hr>
+                    <form @submit.prevent="googleAuth">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button>
+                                    <img src="../../../public/images/icons8-google.svg">
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -49,6 +60,14 @@ const login = async() => {
         } else {
             error.value = res.data.message;
         }
+    })
+}
+
+const googleAuth = async () => {
+    await axios.get('auth/google').then(res => {
+        //router.push(res.data.url)
+        window.location.href = res.data.url
+        console.log(res);
     })
 }
 
