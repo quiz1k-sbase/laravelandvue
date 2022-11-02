@@ -22,7 +22,7 @@
                     <form @submit.prevent="googleAuth">
                         <div class="row">
                             <div class="col-md-12">
-                                <button>
+                                <button class="btn btn-outline-primary w-100">
                                     <img src="../../../public/images/icons8-google.svg">
                                 </button>
 
@@ -37,7 +37,7 @@
 
 <script setup>
 import axios from "axios";
-import { reactive, ref } from "vue";
+import {onBeforeUnmount, onMounted, reactive, ref} from "vue";
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -63,12 +63,58 @@ const login = async() => {
     })
 }
 
+onMounted(() => {
+    window.addEventListener('message', onMessage, false)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('message', onMessage)
+})
 const googleAuth = async () => {
+    const newWindow = openWindow('', 'message')
     await axios.get('auth/google').then(res => {
-        //router.push(res.data.url)
-        window.location.href = res.data.url
-        console.log(res);
+        newWindow.location.href = res.data.url;
     })
+}
+
+const onMessage = (e) => {
+    if (e.origin !== window.origin || !e.data.token) {
+        return
+    }
+    localStorage.setItem('user',e.data.name)
+    localStorage.setItem('token',e.data.token)
+
+    router.push({name: 'home'});
+}
+
+function openWindow (url, title, options = {}) {
+    if (typeof url === 'object') {
+        options = url
+        url = ''
+    }
+
+    options = { url, title, width: 600, height: 720, ...options }
+
+    const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screen.left
+    const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screen.top
+    const width = window.innerWidth || document.documentElement.clientWidth || window.screen.width
+    const height = window.innerHeight || document.documentElement.clientHeight || window.screen.height
+
+    options.left = ((width / 2) - (options.width / 2)) + dualScreenLeft
+    options.top = ((height / 2) - (options.height / 2)) + dualScreenTop
+
+    const optionsStr = Object.keys(options).reduce((acc, key) => {
+        acc.push(`${key}=${options[key]}`)
+        return acc
+    }, []).join(',')
+
+    const newWindow = window.open(url, title, optionsStr)
+
+    if (window.focus) {
+        newWindow.focus()
+    }
+
+    return newWindow
 }
 
 </script>
