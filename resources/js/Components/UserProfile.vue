@@ -4,6 +4,9 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav m-2">
                     <li class="nav-item me-2">
+                        <router-link to="portfolio" type="button" class="btn btn-info">Go to portfolio</router-link>
+                    </li>
+                    <li class="nav-item me-2">
                         <router-link to="home" type="button" class="btn btn-primary">Back home</router-link>
                     </li>
                 </ul>
@@ -394,8 +397,5 @@ const getBalance = (balance) => {
 
 const getExport = async (id) => {
     url += id;
-    /*await axios.get(url + id).then(res => {
-        console.log(res);
-    })*/
 }
 </script>

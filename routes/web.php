@@ -5,8 +5,10 @@ use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FacebookAuthController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\XMLParserController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +72,17 @@ Route::get('parse', [XMLParserController::class, 'parse']);
 
 Route::get('auth/google', [GoogleAuthController::class, 'redirect']);
 Route::get('callback', [GoogleAuthController::class, 'callbackGoogle']);
+
+Route::post('store/photo', [PhotoController::class, 'store']);
+Route::get('get/photos/{id}', [PhotoController::class, 'getPhotos']);
+Route::post('update/photo/title', [PhotoController::class, 'updateTitle']);
+Route::post('update/photo/description', [PhotoController::class, 'updateDescription']);
+Route::post('update/photo/image', [PhotoController::class, 'updateImage']);
+
+Route::post('store/video', [VideoController::class, 'store']);
+Route::get('get/videos/{id}', [VideoController::class, 'getVideos']);
+Route::post('update/video/title', [VideoController::class, 'updateTitle']);
+Route::post('update/video/description', [VideoController::class, 'updateDescription']);
 
 Route::get('/{any}', function () {
     return view('app');

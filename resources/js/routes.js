@@ -36,6 +36,30 @@ const router = createRouter({
             }
         },
         {
+            path: '/portfolio',
+            name: 'portfolio',
+            component: () => import('./Components/Portfolio.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/photos',
+            name: 'photos',
+            component: () => import('./Components/Portfolio/AddPhotos.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/videos',
+            name: 'videos',
+            component: () => import('./Components/Portfolio/AddVideos.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
             path: '/plans',
             name: 'plans',
             component: () => import('./Components/Payment/Plans.vue'),
