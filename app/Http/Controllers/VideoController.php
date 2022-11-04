@@ -13,7 +13,7 @@ class VideoController extends Controller
     public function store(VideoRequest $request)
     {
         $data = $request->all();
-        $img = file_get_contents("https://www.googleapis.com/youtube/v3/videos?key=AIzaSyDUGiF464A3_BNf13bWRIQK5-Du-DR8mw0&part=snippet&id=" . $data['url']);
+        $img = file_get_contents("https://www.googleapis.com/youtube/v3/videos?key=" . config('services.youtube.api_key') . "&part=snippet&id=" . $data['url']);
         $json = json_decode($img);
         Video::create([
             'title' => $data['title'],

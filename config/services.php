@@ -43,4 +43,8 @@ return [
         'redirect' => 'http://laravelandvue.com/callback',
     ],
 
+    'youtube' => [
+        'api_key' => env('YOUTUBE_API_KEY'),
+    ],
+
 ];
