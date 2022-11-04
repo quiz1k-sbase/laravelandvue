@@ -30,10 +30,23 @@
 import {ref} from "vue";
 import axios from "axios";
 import router from "../../routes";
+import Swal from "sweetalert2";
 
 let url = ref([]);
 let title = ref([]);
 let description = ref([]);
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+})
 
 const store = () => {
     const data = new FormData();
@@ -43,8 +56,21 @@ const store = () => {
     title.value = '';
     description.value = '';
     url.value = '';
+
     axios.post('store/video', data).then(res => {
         router.push({name: 'portfolio'});
+        if(res.data.message == 'success') {
+            Toast.fire({
+                icon: 'success',
+                title: 'Video added successfully'
+            })
+        }
+        else {
+            Toast.fire({
+                icon: 'error',
+                title: 'Something went wrong'
+            })
+        }
     })
 }
 

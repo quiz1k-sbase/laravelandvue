@@ -180,6 +180,7 @@
 
 import {onMounted, ref} from "vue";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 let user = ref([]);
 let photos = ref([]);
@@ -207,6 +208,18 @@ const getVideoData = () => {
         console.log(error);
     });
 }
+
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+})
 
 onMounted(() => {
     getData();
@@ -259,6 +272,18 @@ const onUpload = async (id) => {
     fd.append('image', photo.value, photo.value.name);
     fd.append('photo_id', id);
     await axios.post('update/photo/image', fd).then(res => {
+        if(res.data.message == 'success') {
+            Toast.fire({
+                icon: 'success',
+                title: 'Photo changed successfully'
+            })
+        }
+        else {
+            Toast.fire({
+                icon: 'error',
+                title: 'Something went wrong'
+            })
+        }
         getData();
         document.getElementById('closePhoto-' + id).click();
     })
