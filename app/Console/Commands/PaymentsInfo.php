@@ -11,7 +11,9 @@ use App\Jobs\SendEmailJob;
 use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PaymentsInfo extends Command
@@ -107,10 +109,19 @@ class PaymentsInfo extends Command
         $agreementExport = Agreement::all();
         Excel::store(new AExport($agreementExport),'public/documents/agreements.xlsx');
 
-        $file = glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE);
+        $pdf = PDF::loadView('pdf', ['agreements' => $agreementExport])->setOption(['defaultFont' => 'sans-serif']);
+        $pdf->setPaper([0,0,1024,800], 'landscape');
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put('public/documents/agreements.pdf', $content);
+
+        $files = [];
+
+        array_push($files, glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE));
+        array_push($files, glob(storage_path('app/public/documents/agreements.{pdf}'), GLOB_BRACE));
+
         $details = [
             'email' => 'user1@gmail.loc',
-            'file' => $file,
+            'files' => $files,
         ];
         SendEmailJob::dispatch($details);
         echo "Command completed successfully\n";

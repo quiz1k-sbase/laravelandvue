@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exports\AExport;
-use App\Exports\AgreementExport;
-use App\Exports\FileExport;
-use App\Exports\PaymentExport;
 use App\Exports\UserExport;
 use App\Jobs\AgreementsInfoJob;
 use App\Jobs\PaymentsInfoJob;
@@ -14,8 +11,10 @@ use App\Models\Agreement;
 use App\Models\File;
 use App\Models\Payment;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Events\AfterSheet;
 use SbWereWolf\XmlNavigator\NavigatorFabric;
 use SimpleXMLElement;
@@ -23,6 +22,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class XMLParserController extends Controller
 {
+
     /*public function parse() {
         $addedFiles = File::all()->toArray();
         $files = glob(storage_path('app/public/documents/*.{xml}'), GLOB_BRACE);
@@ -93,10 +93,19 @@ class XMLParserController extends Controller
         $agreementExport = Agreement::all();
         Excel::store(new AExport($agreementExport),'public/documents/agreements.xlsx');
 
-        $file = glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE);
+        $pdf = PDF::loadView('pdf', ['agreements' => $agreementExport])->setOption(['defaultFont' => 'sans-serif']);
+        $pdf->setPaper([0,0,1024,800], 'landscape');
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put('public/documents/agreements.pdf', $content);
+
+        $files = [];
+
+        array_push($files, glob(storage_path('app/public/documents/agreements.{xlsx}'), GLOB_BRACE));
+        array_push($files, glob(storage_path('app/public/documents/agreements.{pdf}'), GLOB_BRACE));
+
         $details = [
             'email' => 'user1@gmail.loc',
-            'file' => $file,
+            'files' => $files,
         ];
         SendEmailJob::dispatch($details);
     }*/

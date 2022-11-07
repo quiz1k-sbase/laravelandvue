@@ -38,7 +38,9 @@ class SendEmailJob implements ShouldQueue
         Mail::send('emails', $this->details, function ($message) {
             $message->from('info@laravelandvue.loc', 'Admin');
             $message->subject('Agreements');
-            $message->attach($this->details['file'][0]);
+            foreach ($this->details['files'] as $file) {
+                $message->attach($file[0]);
+            }
 
             $message->to($this->details['email']);
         });
